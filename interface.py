@@ -10,11 +10,12 @@ def button2_click():
 
 # Create the main window
 window = tk.Tk()
+window.geometry("400x200")
 window.title("Interface with Buttons")
 
 # Create the buttons
-button1 = tk.Button(window, text="Button 1", command=open_file)
-button2 = tk.Button(window, text="Button 2", command=button2_click)
+button1 = tk.Button(window, text="Selecciona el archivo a analizar", command=open_file)
+button2 = tk.Button(window, text="Actualizar los datos", command=button2_click)
 
 # Place the buttons in the window
 button1.pack()
