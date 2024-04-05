@@ -85,8 +85,8 @@ def getData_topics(df, reason, num_clusters, num_keywords):
     stopword_es.extend(my_stopwords)
 
     # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, preprocessor=lambda x: re.sub(r'\d+', '', x))
-    count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, token_pattern="[^\W\d_]+")
-    # count_vect = TfidfVectorizer(max_df=0.8, min_df=5, stop_words= stopword_es, lowercase= True, token_pattern="[^\W\d_]+")
+    # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, token_pattern="[^\W\d_]+")
+    count_vect = TfidfVectorizer(max_df=0.8, min_df=5, stop_words= stopword_es, lowercase= True, token_pattern="[^\W\d_]+")
     doc_term_matrix = count_vect.fit_transform(df_reason['Notes'].values.astype('U'))
 
     LDA = LatentDirichletAllocation(n_components=num_clusters, random_state=42)
@@ -114,6 +114,4 @@ def getData_topics(df, reason, num_clusters, num_keywords):
 
     # Retornamos una matriz con las labels, suma de horas y porcentajes para graficar
     data = [indice_str, sumas_str, porcentajes_str]
-    data = dumps(data)
-    keywords = dumps(keywords)
     return data, keywords
