@@ -1,16 +1,20 @@
 import tkinter as tk
 from tkinter import filedialog
-import pandas
+import pandas as pd
 
 import nlp_functions
 
+df = None
+
 def open_file():
+    global df
     file_path = filedialog.askopenfilename()
     print("Selected filepath:", file_path)
-    nlp_functions.read_xlsx(file_path)
+    df = nlp_functions.read_xlsx(file_path)
 
 def button2_click():
     print("Button 2 was clicked")
+    print(nlp_functions.getData_top4(df, 2, 4))
 
 # Create the main window
 window = tk.Tk()

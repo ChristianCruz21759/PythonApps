@@ -64,7 +64,6 @@ def getData_top4(df, num_reasons, num_top):
 
     # Retornamos una matriz con las labels, suma de horas y porcentajes para graficar
     data = [indice_str, sumas_str, porcentajes_str]
-    data = dumps(data)
 
     return data
 
