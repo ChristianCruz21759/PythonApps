@@ -1,10 +1,10 @@
 import pandas as pd
-import io
-import urllib, base64
-import re
+# import io
+# import urllib, base64
+# import re
 import nltk
 
-from sklearn.feature_extraction.text import CountVectorizer
+# from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from sklearn.decomposition import LatentDirichletAllocation

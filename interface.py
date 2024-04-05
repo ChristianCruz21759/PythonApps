@@ -3,6 +3,9 @@ from tkinter import filedialog
 import pandas as pd
 
 import nlp_functions
+import os
+
+hiddenimports = ['scikit-learn', 'sklearn']
 
 df = None
 
@@ -24,12 +27,12 @@ def button3_click():
 
 # Create the main window
 window = tk.Tk()
-window.geometry("400x200")
+window.geometry("1000x800")
 window.title("Análisis Modos de Falla")
 
 # Create the buttons
 button1 = tk.Button(window, text="Selecciona el archivo a analizar", command=open_file)
-button2 = tk.Button(window, text="Analisi Top Reasons", command=button2_click)
+button2 = tk.Button(window, text="Analisis Top Reasons", command=button2_click)
 button3 = tk.Button(window, text="Analisis NLP", command=button3_click)
 
 # Place the buttons in the window
