@@ -1,9 +1,13 @@
 import tkinter as tk
 from tkinter import filedialog
+import pandas
+
+import nlp_functions
 
 def open_file():
     file_path = filedialog.askopenfilename()
     print("Selected filepath:", file_path)
+    nlp_functions.read_xlsx(file_path)
 
 def button2_click():
     print("Button 2 was clicked")
@@ -23,3 +27,6 @@ button2.place(x=30, y=85)
 
 # Start the event loop
 window.mainloop()
+
+
+

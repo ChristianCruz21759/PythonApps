@@ -9,6 +9,21 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from sklearn.decomposition import LatentDirichletAllocation
 
+def read_xlsx(path):
+    if path.endswith(".xlsx"):
+        print("File is an excel file")
+        df = pd.read_excel(path)
+        if [str(x) for x in df.columns] == ['Línea', 'Día', 'Shift', 'Start Time', 'End Time', 'Seconds', 'Minutes',
+        'Hours', 'Start Cycles', 'Start Unit', 'End Cycles', 'End Unit',
+        'Actual Start/End Ratio', 'Listed Start/End Ratio', 'Super Reason',
+        'Reason Lvl1', 'Reason Lvl2', 'Reason Lvl3', 'Reason Lvl4', 'Notes',
+        'SKU', 'User', 'Orden de Producción', 'Dataset']:
+            print("File is valid")
+            return df
+        else: 
+            print("File is invalid")
+    else: 
+        print("File is not an excel file")
 
 # Funcion que retorna los datos para graficar el top4 de razones
 def getData_top4(df, num_reasons, num_top):
