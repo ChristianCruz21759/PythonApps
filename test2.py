@@ -1,9 +1,13 @@
 import tkinter as tk
 from tkinter import ttk
 
+w = 1440
+h = 810
+
+
 def create_widgets():
     # Marco izquierdo
-    left_frame = tk.Frame(root, bg="lightblue", width=200, height=400)
+    left_frame = tk.Frame(root, bg="lightblue", width=440, height=h)
     left_frame.grid(row=0, column=0, padx=10, pady=10)
 
     # Columna para los botones
@@ -19,7 +23,7 @@ def create_widgets():
     entry_column = tk.Frame(left_frame, bg="lightgreen")
     entry_column.grid(row=0, column=1, padx=5, pady=5)
 
-    empty_frame1 = tk.Frame(left_frame, bg="pink", height=100, width=100)
+    empty_frame1 = tk.Frame(left_frame, bg="pink", height=h/2, width=h/2)
     empty_frame1.grid(row=1, column=0, columnspan=2)
 
     # Cuadros de entrada de números en la columna derecha
@@ -31,11 +35,11 @@ def create_widgets():
 
 
     # Marco derecho
-    right_frame = tk.Frame(root, bg="lightgreen", width=800, height=400)
-    right_frame.grid(row=0, column=1, padx=10, pady=10)
+    right_frame = tk.Frame(root, bg="lightgreen", width=1000-10, height=h-20)
+    right_frame.grid(row=0, column=1, padx=0, pady=10)
 
     # Canvas para la columna derecha
-    canvas = tk.Canvas(right_frame, bg="lightgrey", width=800, height=400)
+    canvas = tk.Canvas(right_frame, bg="lightgrey", width=1000-10, height=h-20)
     canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
     # Barra de desplazamiento vertical
@@ -64,7 +68,8 @@ root = tk.Tk()
 root.title("Interfaz con dos columnas")
 
 # Cambiar el tamaño de la ventana
-root.geometry("1000x500")
+root.geometry("1440x810")
+root.resizable(0, 0)
 
 # Llamar a la función para crear widgets
 create_widgets()
