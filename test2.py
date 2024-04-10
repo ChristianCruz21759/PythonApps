@@ -7,6 +7,9 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
 NavigationToolbar2Tk) 
 
+colors = [(1/255, 33/255, 92/255), (122/255, 40/255, 115/255), (207/255, 57/255, 103/255), (255/255, 117/255, 66/255), (255/255, 196/255, 18/255)]
+# cambiar esto por dios
+
 w = 1440
 h = 810
 
@@ -31,9 +34,11 @@ def button2_click():
     toolbar = NavigationToolbar2Tk(fig_canvas, left_frame, pack_toolbar=False)
     toolbar.update()
 
+    explode = [0] * len(data[0]) # only "explode" the 1st slice
+    explode[0] = 0.1
 
     axes = fig.add_subplot()
-    axes.pie(data[1], autopct='%1.1f%%', pctdistance=1.2)
+    axes.pie(data[1], autopct='%1.1f%%', pctdistance=1.2, explode=explode, startangle=90, colors=colors)
 
     box = axes.get_position()
     axes.set_position([box.x0, box.y0 - box.height * buf/20,
