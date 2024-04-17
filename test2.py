@@ -58,6 +58,7 @@ def graph_nlp():
         axes = fig.add_subplot()
         axes.bar(data[0], data[1])
         axes.set_ylim(0, max(data[1])*1.100)    
+        axes.set_title(titles[i])
         
         fig_canvas.get_tk_widget().grid(row=i, column=0)
 
@@ -75,11 +76,13 @@ def graph_nlp():
 def button2_click():
 
     global left_frame
+    global titles
 
     buf = int(num_reasons_btn.get())
 
     print("Analisis Top Reasons")
     data = nlp_functions.getData_top4(df, 2, buf)
+    titles = data[0]
 
     fig = Figure(figsize=(4.05,5), dpi=100)
     fig_canvas = FigureCanvasTkAgg(fig, left_frame)
