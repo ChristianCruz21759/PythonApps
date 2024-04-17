@@ -1,17 +1,19 @@
 import tkinter as tk
+from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
 import nlp_functions
-
 from matplotlib.figure import Figure 
+import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,  
 NavigationToolbar2Tk) 
 
-colors = [(1/255, 33/255, 92/255), (122/255, 40/255, 115/255), (207/255, 57/255, 103/255), (255/255, 117/255, 66/255), (255/255, 196/255, 18/255)]
+colors = ['#02007b', '#7f0075', '#bf0061', '#e91647', '#fe6829', '#ffa600', '#C2C8E3']
 # cambiar esto por dios
+colors2 = ["red", "blue", "green", "orange", "yellow", "red"]
 
 w = 1440
-h = 810
+h = 750
 
 def open_file():
     global df
@@ -19,11 +21,62 @@ def open_file():
     print("Selected filepath:", file_path)  
     df = nlp_functions.read_xlsx(file_path)
 
+def scroll_function(*args):
+    canvas.configure(scrollregion=canvas.bbox("all"))
+
+def graph_nlp():
+    
+    global canvas
+
+    num_reasons = int(num_reasons_btn.get())
+    num_keywords = int(num_keywords_btn.get())
+    num_clusters = int(num_clusters_btn.get())
+
+    # Canvas para la columna derecha
+    canvas = tk.Canvas(root, bg="lightgrey")
+    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+
+    scrollbar = ttk.Scrollbar(root, orient="vertical", command=canvas.yview)
+    scrollbar.pack(side=tk.RIGHT, fill=tk.Y)    
+
+    canvas.configure(yscrollcommand=scrollbar.set)
+    canvas.bind("<Configure>", scroll_function)
+
+    # Marco interior para contener los marcos vacíos
+    inner_frame = tk.Frame(canvas, bg="pink")
+    canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+
+    for i in range(num_reasons):
+
+        data, keywords = nlp_functions.getData_topics(df, num_reasons, i+1, num_clusters, num_keywords)
+        
+        print(data)
+
+        fig = Figure(figsize=(4.5,3), dpi=100)
+        fig_canvas = FigureCanvasTkAgg(fig, inner_frame)
+            
+        axes = fig.add_subplot()
+        axes.bar(data[0], data[1])
+        axes.set_ylim(0, max(data[1])*1.100)    
+        
+        fig_canvas.get_tk_widget().grid(row=i, column=0)
+
+        t = tk.Text(inner_frame, width=65, height=15)
+        for j in range(num_clusters):
+
+            try:
+                topic_str = data[0][j]
+            except IndexError:
+                break
+
+            t.insert(END, topic_str + ": " + str(keywords[j]) +"\n")
+            t.grid(row=i, column=1, pady=10)
+        
 def button2_click():
 
     global left_frame
 
-    buf = int(num_reasons.get())
+    buf = int(num_reasons_btn.get())
 
     print("Analisis Top Reasons")
     data = nlp_functions.getData_top4(df, 2, buf)
@@ -46,14 +99,13 @@ def button2_click():
 
     axes.legend(labels=data[0], loc="upper center", bbox_to_anchor=(0.5, 1 + buf /10))
 
-    fig_canvas.get_tk_widget().grid(row=2, column=0, columnspan=2)
-    toolbar.grid(row=3, column=0, columnspan=2)
+    fig_canvas.get_tk_widget().grid(row=2, column=0, columnspan=3)
+    toolbar.grid(row=3, column=0, columnspan=3)
 
 def button3_click():
     print("Analisis NLP")
-    data, keywords = nlp_functions.getData_topics(df, 1, 5, 3)
-    print(data)
-    print(keywords)
+    # print(keywords)
+    graph_nlp()
 
 
 
@@ -62,11 +114,12 @@ def create_widgets():
     global left_frame
 
     # Marco izquierdo
-    left_frame = tk.Frame(root, bg="lightblue", width=440, height=h-20)
-    left_frame.grid(row=0, column=0, padx=10, pady=10)
+    left_frame = tk.Frame(root, bg="lightblue")
+    # left_frame.grid(row=0, column=0, padx=10, pady=10)
+    left_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.Y)
 
-    title = tk.Label(left_frame, bg="pink", height=5, width=55, text="Analisis Modos de Falla")
-    title.grid(row=0, column=0, padx=5, pady=5, columnspan=2)
+    title = tk.Label(left_frame, bg="pink", height=2, width=25, text="Analisis Modos de Falla", font=("Arial", 25))
+    title.grid(row=0, column=0, padx=5, pady=5, columnspan=3)
 
     # Columna para los botones
     button_column = tk.Frame(left_frame, bg="lightyellow")
@@ -76,21 +129,29 @@ def create_widgets():
     tk.Button(button_column, text="Escoger archivo", command=open_file).pack()
     tk.Button(button_column, text="Analisis de Razones", command=button2_click).pack()
     tk.Button(button_column, text="Analisis NLP",command=button3_click).pack()
+    
+    # Columna para las labels
+    label_column = tk.Frame(left_frame, bg="lightyellow")
+    label_column.grid(row=1, column=1, padx=5, pady=5)
+
+    tk.Label(label_column, text="Razones:").pack()
+    tk.Label(label_column, text="Clusters:").pack()
+    tk.Label(label_column, text="Keywords:").pack()
 
     # Columna para los cuadros de entrada de números
     entry_column = tk.Frame(left_frame, bg="lightgreen")
-    entry_column.grid(row=1, column=1, padx=5, pady=5)
+    entry_column.grid(row=1, column=2, padx=5, pady=5)
 
-    # empty_frame1 = FigureCanvasTkAgg(left_frame, bg="pink", height=h/2, width=h/2)
-    # empty_frame1.grid(row=2, column=0, columnspan=2)
+    global num_reasons_btn
+    global num_clusters_btn
+    global num_keywords_btn
 
-    global num_reasons
 
-    num_reasons = tk.StringVar(value=4)
-    num_keywords = tk.StringVar(value=4)
-    num_clusters = tk.StringVar(value=4)
+    num_reasons_btn = tk.StringVar(value=4)
+    num_clusters_btn = tk.StringVar(value=5)
+    num_keywords_btn = tk.StringVar(value=4)
 
-    num_var = [num_reasons, num_keywords, num_clusters]
+    num_var = [num_reasons_btn, num_clusters_btn, num_keywords_btn]
 
     # Cuadros de entrada de números en la columna derecha
     for i in range(3):
@@ -99,40 +160,41 @@ def create_widgets():
         entry.pack()
 
     # Marco derecho
-    right_frame = tk.Frame(root, bg="lightgreen", width=1000-10, height=h-20)
-    right_frame.grid(row=0, column=1, padx=0, pady=10)
+    # right_frame = tk.Frame(root, bg="lightgreen", width=1000-100)
+    # # right_frame.grid(row=0, column=1, padx=0, pady=10)
+    # right_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.Y)
 
-    # Canvas para la columna derecha
-    canvas = tk.Canvas(right_frame, bg="lightgrey", width=1000-10, height=h-20)
-    canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+    # # Canvas para la columna derecha
+    # canvas = tk.Canvas(root, bg="lightgrey")
+    # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-    # Barra de desplazamiento vertical
-    scrollbar = ttk.Scrollbar(right_frame, orient="vertical", command=canvas.yview)
-    scrollbar.pack(side=tk.RIGHT, fill="y")
+    # scrollbar = ttk.Scrollbar(root, orient="vertical", command=canvas.yview)
+    # scrollbar.pack(side=tk.RIGHT, fill=tk.Y)    
 
-    # Configurar el canvas para que se desplace con la barra de desplazamiento
-    canvas.configure(yscrollcommand=scrollbar.set)
-    canvas.bind('<Configure>', lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+    # canvas.configure(yscrollcommand=scrollbar.set)
+    # canvas.bind("<Configure>", scroll_function)
 
-    # Marco interior para contener los marcos vacíos
-    inner_frame = tk.Frame(canvas, bg="lightgrey")
-    canvas.create_window((0, 0), window=inner_frame, anchor="nw")
+    # # Marco interior para contener los marcos vacíos
+    # inner_frame = tk.Frame(canvas, bg="pink")
+    # canvas.create_window((0, 0), window=inner_frame, anchor="nw")
 
-    # Crear marcos vacíos en el marco interior
-    for i in range(6):
-        row_frame = tk.Frame(inner_frame, bg="white", width=485, height=250, padx=5, pady=5)
-        row_frame.grid(row=i, column=0, padx=5, pady=5)
-        row_frame = tk.Frame(inner_frame, bg="white", width=485, height=250, padx=5, pady=5)
-        row_frame.grid(row=i, column=1, padx=5, pady=5)
-        # row_frame = tk.Frame(inner_frame, bg="white", width=320, height=200, padx=5, pady=5)
-        # row_frame.grid(row=i, column=2, padx=5, pady=5)
+    # num_frames = 6
+
+    # for i in range(num_frames):
+
+    #     # Crear tres frames internos dentro del frame principal
+    #     inner_frames = tk.Frame(inner_frame, bg=colors2[i], width=200, height=200)
+
+    #     # Colocar los frames internos dentro del frame principal
+    #     inner_frames.grid(row=i, column=0, padx=10, pady=10)
+
 
 # Crear la ventana principal
 root = tk.Tk()
-root.title("Interfaz con dos columnas")
+root.title("Analisis Modos de Falla - Manufactura")
 
 # Cambiar el tamaño de la ventana
-root.geometry("1440x810")
+root.geometry("1440x750")
 root.resizable(0, 0)
 
 # Llamar a la función para crear widgets

@@ -68,7 +68,7 @@ def getData_top4(df, num_reasons, num_top):
     return data
 
 #Funcion que retorna los datos para graficar los topics de cada razon
-def getData_topics(df, reason, num_clusters, num_keywords):
+def getData_topics(df, num_reasons, reason, num_clusters, num_keywords):
 
     # Descargar los recursos necesarios de NLTK
     nltk.download('punkt')
@@ -76,7 +76,7 @@ def getData_topics(df, reason, num_clusters, num_keywords):
 
     top4 = df.groupby('Reason')['Hours'].sum()
     top4 = top4.sort_values(ascending = False)
-    top4 = top4.head(4)
+    top4 = top4.head(num_reasons)
 
     df_reason = df[df['Reason'] == top4.index[reason-1]]
 
@@ -113,5 +113,6 @@ def getData_topics(df, reason, num_clusters, num_keywords):
     porcentajes_str = [str(x) for x in round(hours_percent,2)]
 
     # Retornamos una matriz con las labels, suma de horas y porcentajes para graficar
-    data = [indice_str, sumas_str, porcentajes_str]
+    data = [indice_str, hours_sum, porcentajes_str]
+    
     return data, keywords
