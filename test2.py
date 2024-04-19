@@ -49,18 +49,33 @@ def graph_nlp():
     for i in range(num_reasons):
 
         data, keywords = nlp_functions.getData_topics(df, num_reasons, i+1, num_clusters, num_keywords)
-        
+
+
+        values = [float(x) for x in data[1]]
+        percentages = [float(x) for x in data[2]]
+
         print(data)
 
         fig = Figure(figsize=(4.5,3), dpi=100)
         fig_canvas = FigureCanvasTkAgg(fig, inner_frame)
             
         axes = fig.add_subplot()
-        axes.bar(data[0], data[1])
-        axes.set_ylim(0, max(data[1])*1.100)    
+        axes.bar(data[0], values, color=colors[i])
+        axes.set_ylim(0, max(values)*1.250)    
         axes.set_title(titles[i])
+
         
         fig_canvas.get_tk_widget().grid(row=i, column=0)
+
+        # Agregar etiquetas con las horas sobre cada barra
+        for k, v in enumerate(values):
+            try:
+                axes.text(k, v+max(values)/7, f'{data[1][k]} h' , ha='center', va='center', weight= 200)
+                axes.text(k, v+max(values)/14, f'{data[2][k]}%' , ha='center', va='center', weight= 200)
+            except KeyError:
+                break
+        
+        axes.text(k-1*(k+1)/4, max(values), f'Total de horas: \n{round(sum(values),2)} h', bbox=dict(facecolor='white', alpha=0.5), fontsize= 'medium')
 
         t = tk.Text(inner_frame, width=65, height=15)
         for j in range(num_clusters):

@@ -113,6 +113,6 @@ def getData_topics(df, num_reasons, reason, num_clusters, num_keywords):
     porcentajes_str = [str(x) for x in round(hours_percent,2)]
 
     # Retornamos una matriz con las labels, suma de horas y porcentajes para graficar
-    data = [indice_str, hours_sum, porcentajes_str]
+    data = [indice_str, sumas_str, porcentajes_str]
     
     return data, keywords
