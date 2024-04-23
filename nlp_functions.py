@@ -116,3 +116,32 @@ def getData_topics(df, num_reasons, reason, num_clusters, num_keywords):
     data = [indice_str, sumas_str, porcentajes_str]
     
     return data, keywords
+
+#Funcion que retorna los datos para graficar los SKU de cada razon
+def getData_sku(df, num_reasons, reason, num_sku):
+    
+    top4 = df.groupby('Reason')['Hours'].sum()
+    top4 = top4.sort_values(ascending = False)
+    top4 = top4.head(num_reasons)
+
+    df_reason = df[df['Reason'] == top4.index[reason-1]]
+
+    # Filtrar el DataFrame y calcular las sumas para cada categoría
+    hours_sum = df_reason.groupby('SKU')['Hours'].sum()
+
+    hours_sum = hours_sum.sort_values(ascending=False)
+
+    # Calcular los porcentajes de cada suma
+    hours_percent = hours_sum / hours_sum.sum() * 100
+
+    top_values = hours_sum.head(num_sku)
+    top_values_percent = hours_percent.head(num_sku)
+    
+    indice_str = [str(x) for x in top_values.index]
+    sumas_str = [str(x) for x in round(top_values,2)]
+    porcentajes_str = [str(x) for x in round(top_values_percent,2)]
+    
+
+    data = [indice_str, sumas_str, porcentajes_str]
+
+    return data
