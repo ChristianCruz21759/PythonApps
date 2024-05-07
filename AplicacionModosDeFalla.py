@@ -5,12 +5,12 @@
 # Definicion de librerias a utilizar
 
 # Cosas por arreglar
+# max df and min df check value error
+# download stop words once
+# delete console from appearing --noconsole on creating app
+# add loaded file alert
 
 # Botones
-# Cambiar de area despues de graficar, usar otro df sin modificar el original
-
-
-
 
 import tkinter as tk
 from tkinter import *
@@ -42,6 +42,10 @@ def open_file():                                # Funcion para abrir el archivo 
     file_path = filedialog.askopenfilename()
     print("Selected filepath:", file_path)
     df = nlp_functions.read_xlsx(file_path)
+    if file_path == '':
+        b2['state'] = 'disabled'
+    else:
+        b2['state'] = 'normal'
 
 
 def clear():                                    # Funcion para limpiar las graficas
@@ -55,6 +59,7 @@ def clear():                                    # Funcion para limpiar las grafi
         scrollbar_x.destroy()
         scrollbar_y.destroy()
         toolbar.destroy()
+        right_frame.destroy()
 
 
 def scroll_function(*args):                   # Funcion para actualizar las scroll bars
@@ -79,6 +84,8 @@ def button2_click():
 def button3_click():
     clear()
     switch()
+    b2['state'] = 'disabled'
+    b3['state'] = 'disabled'
 
 
 def my_callback(var, index, mode):
@@ -88,12 +95,8 @@ def my_callback(var, index, mode):
 def switch():
     if option_value.get().startswith('Selecciona'):
         b1['state'] = 'disabled'
-        b2['state'] = 'disabled'
-        b3['state'] = 'disabled'
     else:
         b1['state'] = 'normal'
-        b2['state'] = 'normal'
-        b3['state'] = 'normal'
 
 # Funciones para graficar
 
@@ -148,7 +151,18 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
     toolbar.grid(row=3, column=0, columnspan=4)
 
 
+def makeCanvas():
+    global right_frame
+        # Canvas para la columna derecha
+    right_frame = tk.Canvas(root, height=winHeight-50,
+                            width=winWidth-562, bg='white')
+    # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+    right_frame.grid(row=0, column=1, padx=10, pady=10)
+    
+
 def graph_nlp():
+    
+    makeCanvas()
 
     global inner_frame
     global scrollbar_x
@@ -264,13 +278,15 @@ def graph_nlp():
     right_frame.configure(xscrollcommand=scrollbar_x.set)
     right_frame.bind("<Configure>", scroll_function)
 
+    b3['state'] = 'normal'
+
 # Funciona para crear widgets
 
 
 def create_widgets():
 
     global left_frame           # Marco izquierdo
-    global right_frame          # Marco derecho (canvas)
+    # global right_frame          # Marco derecho (canvas)
 
     # Marco izquierdo
     left_frame = tk.Frame(root, bg="lightblue",
@@ -283,7 +299,7 @@ def create_widgets():
     title.grid(row=0, column=0, padx=5, pady=5, columnspan=4)
 
     # Columna para los botones (1,0)
-    button_column = tk.Frame(left_frame, bg="lightyellow")
+    button_column = tk.Frame(left_frame)
     button_column.grid(row=1, column=0, padx=5, pady=5)
 
     global b1
@@ -305,7 +321,7 @@ def create_widgets():
     b3['state'] = 'disabled'
 
     # Columna para lista (listbox) (1,1)
-    optionsList_column = tk.Frame(left_frame, bg="lightgreen")
+    optionsList_column = tk.Frame(left_frame)
     optionsList_column.grid(row=1, column=1, padx=5, pady=5)
 
     tk.Label(optionsList_column, text="Area:").pack()
@@ -321,7 +337,7 @@ def create_widgets():
     option_menu.pack()
 
     # Columna para las labels (1,2)
-    label_column = tk.Frame(left_frame, bg="lightyellow")
+    label_column = tk.Frame(left_frame)
     label_column.grid(row=1, column=2, padx=5, pady=5)
 
     # Labels para los botones
@@ -330,7 +346,7 @@ def create_widgets():
     tk.Label(label_column, text="Keywords:").pack()
 
     # Columna para los cuadros de entrada de números (1,3)
-    entry_column = tk.Frame(left_frame, bg="lightgreen")
+    entry_column = tk.Frame(left_frame)
     entry_column.grid(row=1, column=3, padx=5, pady=5)
 
     # Leer valores de los spinbox y volverlos globales
@@ -348,15 +364,11 @@ def create_widgets():
     for i in range(3):
         entry = tk.Spinbox(
             entry_column, from_=3, to=6, textvariable=num_var[i])
-        entry.pack()
+        entry.pack()    
 
-    # Canvas para la columna derecha
-    right_frame = tk.Canvas(root, height=winHeight-50,
-                            width=winWidth-562, bg='white')
-    # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-    right_frame.grid(row=0, column=1, padx=10, pady=10)
 
-    switch()
+
+    # switch()
 
 # Codigo para la ventana principal
 
