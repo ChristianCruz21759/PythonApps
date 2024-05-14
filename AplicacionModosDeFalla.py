@@ -150,7 +150,7 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
     # Colocamos la toolbar en el grid
     # toolbar.grid(row=3, column=0, columnspan=4)
 
-# --- FUNCIONES PARA GRAFICAR ANALISIS NLP Y SKU ----------------------------------------------
+# --- FUNCION PARA GRAFICAR ANALISIS NLP Y SKU ----------------------------------------------
 
 def graph_nlp():
 
@@ -160,10 +160,6 @@ def graph_nlp():
     num_reasons = int(num_reasons_btn.get())
     num_keywords = int(num_keywords_btn.get())
     num_clusters = int(num_clusters_btn.get())
-
-    # Marco interior para contener los marcos vacíos
-    # inner_frame = tk.Frame(right_frame, bg='white', padx=5, pady=5)
-    # right_frame.create_window((0, 0), window=inner_frame, anchor="nw")
 
     # Realizamos el numero de analisis NLP para el numero de razones (si es posible)
     for i in range(num_reasons):
@@ -222,6 +218,7 @@ def graph_nlp():
         axes.set_xlim(0, max(values)*1.3)
         axes.set_title("SKU " + titles[i])
         wrapped_labels = ['\n'.join(wrap(l, 10)) for l in data2[0]] 
+        axes.set_yticks(data2[0])
         axes.set_yticklabels(wrapped_labels)
         
         # Colocamos grafica en la fila
@@ -235,16 +232,6 @@ def graph_nlp():
             except KeyError:
                 break
     updateScrollRegion()
-    # Creamos las scrollbars y las configuramos
-    # scrollbar_y = ttk.Scrollbar(root, orient="vertical", command=right_frame.yview)
-    # scrollbar_y.grid(row=0, column=2, sticky='NS')
-
-    # scrollbar_x = ttk.Scrollbar(root, orient="horizontal", command=right_frame.xview)
-    # scrollbar_x.grid(row=1, column=1, columnspan=2, sticky='WE')
-
-    # right_frame.configure(yscrollcommand=scrollbar_y.set)
-    # right_frame.configure(xscrollcommand=scrollbar_x.set)
-    # right_frame.bind("<Configure>", scroll_function)
 
     b3['state'] = 'normal'
 
