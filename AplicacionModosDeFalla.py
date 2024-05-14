@@ -6,9 +6,7 @@
 # ==========================================================
 
 # --------- TO DO LIST ---------
-# max df and min df check value error
 # delete console from appearing --noconsole on creating app
-# delete clean button
 
 # ------ DEFINICION DE LIBRERIAS -----------------------------------------
 
@@ -62,6 +60,7 @@ def clear():
         print("error")
     else:
         fig_canvas1.get_tk_widget().destroy()
+        inner_frame.destroy()
 
 # Funcion para actualizar las scroll bars
 def scroll_function(*args):
@@ -91,7 +90,6 @@ def button3_click():
     clear()
     switch()
     b2['state'] = 'disabled'
-    b3['state'] = 'disabled'
 
 # CALLBACK DROPDOWN MENU
 def my_callback(var, index, mode):
@@ -155,6 +153,10 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
 def graph_nlp():
 
     global inner_frame
+    
+    # Crear un objeto de ventana para poder scrollear dentro de el, usamos inner frame como el objeto 
+    inner_frame = tk.Frame(right_frame)
+    right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
 
     # Obtenemos configuraciones de los spinbox
     num_reasons = int(num_reasons_btn.get())
@@ -163,77 +165,78 @@ def graph_nlp():
 
     # Realizamos el numero de analisis NLP para el numero de razones (si es posible)
     for i in range(num_reasons):
+        try:
+            # Obtenemos los datos de NLP y los guardamos en variables temporales
+            data, keywords = nlp_functions.getData_topics(
+                new_df, num_reasons, i+1, num_clusters, num_keywords, stopwords_es)
+            values = [float(x) for x in data[1]]
 
-        # Obtenemos los datos de NLP y los guardamos en variables temporales
-        data, keywords = nlp_functions.getData_topics(
-            new_df, num_reasons, i+1, num_clusters, num_keywords, stopwords_es)
-        values = [float(x) for x in data[1]]
+            # Creamos la fila donde iran nuestas graficas
+            graph_frame = tk.Frame(inner_frame, bg=colors[i])
+            graph_frame.grid(row=i, column=0)
 
-        # Creamos la fila donde iran nuestas graficas
-        graph_frame = tk.Frame(inner_frame, bg=colors[i])
-        graph_frame.grid(row=i, column=0)
+            # Creamos la figura y el grafico de barras
+            fig = Figure(figsize=(4.5, 4), dpi=100)
+            fig_canvas = FigureCanvasTkAgg(fig, graph_frame)
+            axes = fig.add_subplot()
+            axes.bar(data[0], values, color=colors[i])
+            axes.set_ylim(0, max(values)*1.250)
+            axes.set_title(titles[i])
 
-        # Creamos la figura y el grafico de barras
-        fig = Figure(figsize=(4.5, 4), dpi=100)
-        fig_canvas = FigureCanvasTkAgg(fig, graph_frame)
-        axes = fig.add_subplot()
-        axes.bar(data[0], values, color=colors[i])
-        axes.set_ylim(0, max(values)*1.250)
-        axes.set_title(titles[i])
+            # Colocamos la grafica en la fila
+            fig_canvas.get_tk_widget().grid(row=0, column=0, pady=10)
 
-        # Colocamos la grafica en la fila
-        fig_canvas.get_tk_widget().grid(row=0, column=0, pady=10)
+            # Agregar etiquetas con las horas sobre cada barra
+            for k, v in enumerate(values):
+                try:
+                    axes.text(k, v+max(values)/7, f'{data[1][k]} h', ha='center', va='center', weight=200)
+                    axes.text(k, v+max(values)/14, f'{data[2][k]}%', ha='center', va='center', weight=200)
+                except KeyError:
+                    break
 
-        # Agregar etiquetas con las horas sobre cada barra
-        for k, v in enumerate(values):
-            try:
-                axes.text(k, v+max(values)/7, f'{data[1][k]} h', ha='center', va='center', weight=200)
-                axes.text(k, v+max(values)/14, f'{data[2][k]}%', ha='center', va='center', weight=200)
-            except KeyError:
-                break
+            # Creamos cuadro con total de horas
+            axes.text(k-1*(k+1)/4, max(values), f'Total de horas: \n{round(
+                sum(values), 2)} h', bbox=dict(facecolor='white', alpha=0.5), fontsize='medium')
 
-        # Creamos cuadro con total de horas
-        axes.text(k-1*(k+1)/4, max(values), f'Total de horas: \n{round(
-            sum(values), 2)} h', bbox=dict(facecolor='white', alpha=0.5), fontsize='medium')
+            # Incluimos las keywords como label en la fila
+            var = StringVar()
+            t = tk.Label(graph_frame, width=50, font='Arial 13', textvariable=var, anchor=tk.W, justify="left", padx=5, bg='white')
+            buf = ''
+            for j in range(len(data[0])):
+                buf = buf + data[0][j] + ": " + str(keywords[j]) + "\n"
+            var.set(buf)
+            # Colocamos la label en la fila
+            t.grid(row=0, column=1, pady=10, sticky='NS')
 
-        # Incluimos las keywords como label en la fila
-        var = StringVar()
-        t = tk.Label(graph_frame, width=50, font='Arial 13', textvariable=var, anchor=tk.W, justify="left", padx=5, bg='white')
-        buf = ''
-        for j in range(len(data[0])):
-            buf = buf + data[0][j] + ": " + str(keywords[j]) + "\n"
-        var.set(buf)
-        # Colocamos la label en la fila
-        t.grid(row=0, column=1, pady=10, sticky='NS')
+            # Obtenemos data SKu y se guarda en variables temporales
+            data2 = nlp_functions.getData_sku(new_df, num_reasons, i+1, 4)
+            values = [float(x) for x in data2[1]]
 
-        # Obtenemos data SKu y se guarda en variables temporales
-        data2 = nlp_functions.getData_sku(new_df, num_reasons, i+1, 4)
-        values = [float(x) for x in data2[1]]
+            # Creamos figura y graficas
+            fig = Figure(figsize=(7, 4), dpi=100)
+            fig_canvas = FigureCanvasTkAgg(fig, graph_frame)
+            axes = fig.add_subplot()
+            axes.barh(data2[0], values, color=colors[i])
+            axes.set_xlim(0, max(values)*1.3)
+            axes.set_title("SKU " + titles[i])
+            wrapped_labels = ['\n'.join(wrap(l, 10)) for l in data2[0]] 
+            axes.set_yticks(data2[0])
+            axes.set_yticklabels(wrapped_labels)
+            
+            # Colocamos grafica en la fila
+            fig_canvas.get_tk_widget().grid(row=0, column=2)
 
-        # Creamos figura y graficas
-        fig = Figure(figsize=(7, 4), dpi=100)
-        fig_canvas = FigureCanvasTkAgg(fig, graph_frame)
-        axes = fig.add_subplot()
-        axes.barh(data2[0], values, color=colors[i])
-        axes.set_xlim(0, max(values)*1.3)
-        axes.set_title("SKU " + titles[i])
-        wrapped_labels = ['\n'.join(wrap(l, 10)) for l in data2[0]] 
-        axes.set_yticks(data2[0])
-        axes.set_yticklabels(wrapped_labels)
-        
-        # Colocamos grafica en la fila
-        fig_canvas.get_tk_widget().grid(row=0, column=2)
-
-        # Agregar etiquetas con las horas sobre cada barra
-        for k, v in enumerate(values):
-            try:
-                axes.text(v+max(values)/14, k, f'{data2[1][k]}h', ha='center', va='center', weight=200)
-                axes.text(v+max(values)/5, k, f'{data2[2][k]}%', ha='center', va='center', weight=200)
-            except KeyError:
-                break
+            # Agregar etiquetas con las horas sobre cada barra
+            for k, v in enumerate(values):
+                try:
+                    axes.text(v+max(values)/14, k, f'{data2[1][k]}h', ha='center', va='center', weight=200)
+                    axes.text(v+max(values)/5, k, f'{data2[2][k]}%', ha='center', va='center', weight=200)
+                except KeyError:
+                    break
+        except ValueError:
+            messagebox.showinfo("Advertencia", "No se puede obtener el numero de clusters solicitados de este archivo. Creados el numero maximo posible.")
+                    
     updateScrollRegion()
-
-    b3['state'] = 'normal'
 
 # ------ FUNCION PARA CREAR WIDGETS ----------------------------------------------
 
@@ -260,8 +263,7 @@ def create_widgets():
 
     global b1
     global b2
-    global b3
-
+    
     # Botones en la columna izquierda
     b1 = tk.Button(button_column, text="Escoger archivo", command=button1_click)
     b1.pack()
@@ -270,9 +272,6 @@ def create_widgets():
     b2 = tk.Button(button_column, text="Analizar archivo", command=button2_click)
     b2.pack()
     b2['state'] = 'disabled'
-    b3 = tk.Button(button_column, text="Limpiar", command=button3_click)
-    b3.pack()
-    b3['state'] = 'disabled'
 
     # Columna para lista (listbox) (1,1)
     optionsList_column = tk.Frame(left_frame)
@@ -322,7 +321,6 @@ def create_widgets():
         
     # Crear elementos para el marco derecho
     right_frame = tk.Canvas(root, height=winHeight-50, width=winWidth-562, bg='white')    
-    inner_frame = tk.Frame(right_frame)
     HorizontalScrollBar = tk.Scrollbar(root)
     VerticalScrollBar = tk.Scrollbar(root)
     
@@ -335,9 +333,6 @@ def create_widgets():
     VerticalScrollBar.grid(row=0, column=2, sticky='NS')
     HorizontalScrollBar.grid(row=1, column=1, columnspan=2, sticky='WE')
     right_frame.grid(row=0, column=1, padx=10, pady=10)
-    
-    # Crear un objeto de ventana para poder scrollear dentro de el, usamos inner frame como el objeto 
-    right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
 
 # ------ CODIGO PARA CREAR LA VENTANA PRINCIPAL/MAIN LOOP -----------------
 
