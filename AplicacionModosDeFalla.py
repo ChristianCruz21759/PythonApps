@@ -7,7 +7,7 @@
 # delete console from appearing --noconsole on creating app
 # add loaded file alert
 
-# IMPORTANDO LIBRERIAS
+# ------ DEFINICION DE LIBRERIAS -----------------------------------------
 
 import tkinter as tk
 from tkinter import *
@@ -21,32 +21,38 @@ from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg,
                                                NavigationToolbar2Tk)
 from textwrap import wrap
 
-# Definicion de Variables Globales
+# ------ DEFINICION DE VARIABLES GLOBALES ----------------------------------
 
-colors = ['#02007b', '#7f0075', '#bf0061',                  # Colores para las graficas
+# Colores para graficas
+colors = ['#02007b', '#7f0075', '#bf0061',
           '#e91647', '#fe6829', '#ffa600', '#c2c8e3']
 
+# Tamaño de la ventana
 winWidth = 1440        # Largo ventana
 winHeight = 750         # Altura ventana
 
+# Lista de opciones
 optionsList = ["LEF", "IndExt"]
 
-# Definicion de funciones
+# ------ DEFINICION DE FUNCIONES -----------------------------------------
+
+# Funcion para abrir el archivo seleccionado - Boton 1
 
 
-def open_file():                                # Funcion para abrir el archivo seleccionadio - Boton 1
+def open_file():
     global df
-    clear()
     file_path = filedialog.askopenfilename()
-    print("Selected filepath:", file_path)
+    # print("Selected filepath:", file_path)
     df = nlp_functions.read_xlsx(file_path)
     if file_path == '':
         b2['state'] = 'disabled'
     else:
         b2['state'] = 'normal'
 
+# Funcion para limpiar las graficas
 
-def clear():                                    # Funcion para limpiar las graficas
+
+def clear():
     try:
         inner_frame
     except NameError:
@@ -56,20 +62,26 @@ def clear():                                    # Funcion para limpiar las grafi
         inner_frame.destroy()
         scrollbar_x.destroy()
         scrollbar_y.destroy()
-        toolbar.destroy()
+        # toolbar.destroy()
         right_frame.destroy()
 
+# Funcion para actualizar las scroll bars
 
-def scroll_function(*args):                   # Funcion para actualizar las scroll bars
+
+def scroll_function(*args):
     right_frame.configure(scrollregion=right_frame.bbox("all"))
 
-# Funciones para los botones
+# ------ FUNCIONES PARA LOS WIDGETS ------------------------------------------------
+
+# BOTON 1
 
 
 def button1_click():
     clear()
     open_file()
     switch()
+
+# BOTON 2
 
 
 def button2_click():
@@ -78,6 +90,8 @@ def button2_click():
     graph_nlp()
     switch()
 
+# BOTON 3
+
 
 def button3_click():
     clear()
@@ -85,9 +99,13 @@ def button3_click():
     b2['state'] = 'disabled'
     b3['state'] = 'disabled'
 
+# CALLBACK DROPDOWN MENU
+
 
 def my_callback(var, index, mode):
     switch()
+
+# SWITCH PARA ENABLE/DISABLE BOTONES
 
 
 def switch():
@@ -96,14 +114,16 @@ def switch():
     else:
         b1['state'] = 'normal'
 
-# Funciones para graficar
+# ------ FUNCIONES PARA GRAFICAR ---------------------------------------------
+
+# --- FUNCION PARA GRAFICAR RAZONES PRINCIPALES ------------------------------
 
 
 def graph_reasons():        # Funcion para graficar las razones principales en un pie chart
 
     global titles
     global fig_canvas1
-    global toolbar
+    # global toolbar
     global new_df
 
     buf = int(num_reasons_btn.get())    # Obtenemos numero de razones
@@ -125,9 +145,9 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
     fig = Figure(figsize=(4.05, 5), dpi=100)            # Creamos figura
     fig_canvas1 = FigureCanvasTkAgg(fig, left_frame)
 
-    toolbar = NavigationToolbar2Tk(
-        fig_canvas1, left_frame, pack_toolbar=False)  # Creamos toolbar
-    toolbar.update()
+    # toolbar = NavigationToolbar2Tk(
+    #     fig_canvas1, left_frame, pack_toolbar=False)  # Creamos toolbar
+    # toolbar.update()
 
     explode = [0] * len(data[0])  # Razon 1 resaltada
     explode[0] = 0.1
@@ -146,20 +166,22 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
     # Colocamos la figura en el grid
     fig_canvas1.get_tk_widget().grid(row=2, column=0, columnspan=4)
     # Colocamos la toolbar en el grid
-    toolbar.grid(row=3, column=0, columnspan=4)
+    # toolbar.grid(row=3, column=0, columnspan=4)
+
+# --- FUNCIONES PARA GRAFICAR ANALISIS NLP Y SKU
 
 
 def makeCanvas():
     global right_frame
-        # Canvas para la columna derecha
+    # Canvas para la columna derecha
     right_frame = tk.Canvas(root, height=winHeight-50,
                             width=winWidth-562, bg='white')
     # canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
     right_frame.grid(row=0, column=1, padx=10, pady=10)
-    
+
 
 def graph_nlp():
-    
+
     makeCanvas()
 
     global inner_frame
@@ -180,7 +202,7 @@ def graph_nlp():
             new_df, num_reasons, i+1, num_clusters, num_keywords, stopwords_es)
 
         values = [float(x) for x in data[1]]
-        percentages = [float(x) for x in data[2]]
+        # percentages = [float(x) for x in data[2]]
 
         # print(data)
 
@@ -231,7 +253,7 @@ def graph_nlp():
         data2 = nlp_functions.getData_sku(new_df, num_reasons, i+1, 4)
 
         values = [float(x) for x in data2[1]]
-        percentages = [float(x) for x in data2[2]]
+        # percentages = [float(x) for x in data2[2]]
 
         # print(data)
 
@@ -278,7 +300,7 @@ def graph_nlp():
 
     b3['state'] = 'normal'
 
-# Funciona para crear widgets
+# ------ FUNCION PARA CREAR WIDGETS ----------------------------------------------
 
 
 def create_widgets():
@@ -303,6 +325,7 @@ def create_widgets():
     global b1
     global b2
     global b3
+    
     # Botones en la columna izquierda
     b1 = tk.Button(button_column, text="Escoger archivo",
                    command=button1_click)
@@ -362,14 +385,9 @@ def create_widgets():
     for i in range(3):
         entry = tk.Spinbox(
             entry_column, from_=3, to=6, textvariable=num_var[i])
-        entry.pack()    
+        entry.pack()
 
-
-
-    # switch()
-
-# Codigo para la ventana principal
-
+# ------ CODIGO PARA CREAR LA VENTANA PRINCIPAL/MAIN LOOP -----------------
 
 # Crear la ventana principal
 root = tk.Tk()
@@ -380,18 +398,20 @@ root.config(background='white')
 winSize = str(winWidth)+'x'+str(winHeight)
 root.geometry(winSize)
 root.resizable(0, 0)
+
+# Incluir logo como icono
 pic = PhotoImage(file="apex logo.png")
 root.iconphoto(False, pic)
 
+# Descargar recursos para NLTK
 nltk.download('punkt')
 nltk.download('stopwords')
-
+# Obtener stopwords en español
 stopwords_es = nltk.corpus.stopwords.words('spanish')
-# Descargar los recursos necesarios de NLTK
-
+# Agregar nuestras propias stopwords
 my_stopwords = ['dee', 'agr', 'een', 'nan', 'iw', '']
 stopwords_es.extend(my_stopwords)
-    
+
 # Llamar a la función para crear widgets
 create_widgets()
 
