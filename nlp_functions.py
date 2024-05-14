@@ -1,14 +1,17 @@
-import pandas as pd
-# import io
-# import urllib, base64
-# import re
-import nltk
+# =========================================================
+# FUNCIONES NECESARIAS PARA EL ANALISIS NLP
+# =========================================================
 
+# ------ DEFINICION DE LIBRERIAS ---------------------------------------
+
+import pandas as pd
 # from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.corpus import stopwords
 from sklearn.decomposition import LatentDirichletAllocation
 
+# ------ FUNCION PARA LEER EL ARCHIVO EXCEL --------------------------
+# Leemos el archivo con pandas, verificamos que sea un archivo valido y retornamos el
 def read_xlsx(path):
     if path.endswith(".xlsx"):
         print("File is an excel file")
@@ -18,15 +21,16 @@ def read_xlsx(path):
         'Actual Start/End Ratio', 'Listed Start/End Ratio', 'Super Reason',
         'Reason Lvl1', 'Reason Lvl2', 'Reason Lvl3', 'Reason Lvl4', 'Notes',
         'SKU', 'User', 'Orden de Producción', 'Dataset']:
-            print("File is valid")
+            # print("File is valid")
             return df
-        else: 
-            print("File is invalid")
-    else: 
-        print("File is not an excel file")
+        # else: 
+            # print("File is invalid")
+    # else: 
+    #     print("File is not an excel file")
 
-# Funcion que retorna los datos para graficar el top4 de razones
-def getData_top4(df, num_reasons, num_top):
+# ------ FUNCION PARA EL TOP DE RAZONES -----------------------------
+
+def getData_top(df, num_reasons, num_top):
 
     # Especificamos que tantas razones queremos concatenar
     if num_reasons <= 1:
@@ -67,22 +71,15 @@ def getData_top4(df, num_reasons, num_top):
 
     return data
 
-#Funcion que retorna los datos para graficar los topics de cada razon
-def getData_topics(df, num_reasons, reason, num_clusters, num_keywords, stopwords):
+# ------ FUNCION PARA OBTENER LOS DATOS DE LOS ANALISIS NLP -------------------------
 
-    # Descargar los recursos necesarios de NLTK
-    # nltk.download('punkt')
-    # nltk.download('stopwords')
+def getData_topics(df, num_reasons, reason, num_clusters, num_keywords, stopwords):
 
     top4 = df.groupby('Reason')['Hours'].sum()
     top4 = top4.sort_values(ascending = False)
     top4 = top4.head(num_reasons)
 
     df_reason = df[df['Reason'] == top4.index[reason-1]]
-
-
-    # my_stopwords = ['dee', 'agr', 'een', 'nan', 'iw', '']
-    # stopwords_es.extend(my_stopwords)
 
     # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, preprocessor=lambda x: re.sub(r'\d+', '', x))
     # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, token_pattern="[^\W\d_]+")
@@ -117,7 +114,8 @@ def getData_topics(df, num_reasons, reason, num_clusters, num_keywords, stopword
     
     return data, keywords
 
-#Funcion que retorna los datos para graficar los SKU de cada razon
+# ------ FUNCION PARA OBTENER LOS DATOS DE SKU -------------------------------
+
 def getData_sku(df, num_reasons, reason, num_sku):
     
     top4 = df.groupby('Reason')['Hours'].sum()

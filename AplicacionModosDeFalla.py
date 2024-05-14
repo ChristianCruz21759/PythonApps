@@ -1,11 +1,14 @@
+# ==========================================================
+# Apex Global Mobility S.A.
 # Analisis Modos de Falla para sistema ATLAS
 # Desarrollado por: Christian Cruz
 # Fecha: 14/5/2024
+# ==========================================================
 
 # --------- TO DO LIST ---------
 # max df and min df check value error
 # delete console from appearing --noconsole on creating app
-# add loaded file alert
+# delete clean button
 
 # ------ DEFINICION DE LIBRERIAS -----------------------------------------
 
@@ -124,7 +127,7 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
         tags = ['Paradas Electromecanicas', 'Paradas Operacionales']
 
     new_df = df[df['Super Reason'].isin(tags)]                 # Obtenemos los registros de esa super razon
-    data = nlp_functions.getData_top4(new_df, 2, buf)          # Obtenemos data de las razones
+    data = nlp_functions.getData_top(new_df, 2, buf)          # Obtenemos data de las razones
     titles = data[0]                                           # Guardamos los titulos como variable global
     fig = Figure(figsize=(4.05, 5), dpi=100)                   # Creamos figura
     fig_canvas1 = FigureCanvasTkAgg(fig, left_frame)
@@ -149,33 +152,9 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
 
 # --- FUNCIONES PARA GRAFICAR ANALISIS NLP Y SKU ----------------------------------------------
 
-# def createScrollableContainer():
-# 	right_frame.config(xscrollcommand=HorizontalScrollBar.set,yscrollcommand=VerticalScrollBar.set, highlightthickness=0)
-# 	HorizontalScrollBar.config(orient=tk.HORIZONTAL, command=inner_frame.xview)
-# 	VerticalScrollBar.config(orient=tk.VERTICAL, command=inner_frame.yview)
-
-# 	HorizontalScrollBar.pack(fill=tk.X, side=tk.BOTTOM, expand=tk.FALSE)
-# 	VerticalScrollBar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
-#     right_frame.grid(row=0, column=1, padx=10, pady=10)
-# 	right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
-
-# Funcion para crear el marco derecho
-# def makeCanvas():
-#     global right_frame
-#     # Canvas para la columna derecha
-#     right_frame = tk.Canvas(root, height=winHeight-50, width=winWidth-562, bg='white')
-#     # right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-#     right_frame.grid(row=0, column=1, padx=10, pady=10)     
-    
-# Funcion para crear graficas NLP y SKU
-
 def graph_nlp():
 
-    # makeCanvas()
-
     global inner_frame
-    global scrollbar_x
-    global scrollbar_y
 
     # Obtenemos configuraciones de los spinbox
     num_reasons = int(num_reasons_btn.get())
@@ -354,25 +333,24 @@ def create_widgets():
             entry_column, from_=3, to=6, textvariable=num_var[i])
         entry.pack()
         
-        
+    # Crear elementos para el marco derecho
     right_frame = tk.Canvas(root, height=winHeight-50, width=winWidth-562, bg='white')    
     inner_frame = tk.Frame(right_frame)
     HorizontalScrollBar = tk.Scrollbar(root)
     VerticalScrollBar = tk.Scrollbar(root)
     
+    # Configurar scrollbars 
     right_frame.config(xscrollcommand=HorizontalScrollBar.set,yscrollcommand=VerticalScrollBar.set, highlightthickness=0)
     HorizontalScrollBar.config(orient=tk.HORIZONTAL, command=right_frame.xview)
     VerticalScrollBar.config(orient=tk.VERTICAL, command=right_frame.yview)
     
-    # HorizontalScrollBar.pack(fill=tk.X, side=tk.BOTTOM, expand=tk.FALSE)
-    # VerticalScrollBar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
-    
+    # Colocar objetos en el root
     VerticalScrollBar.grid(row=0, column=2, sticky='NS')
     HorizontalScrollBar.grid(row=1, column=1, columnspan=2, sticky='WE')
-    
     right_frame.grid(row=0, column=1, padx=10, pady=10)
+    
+    # Crear un objeto de ventana para poder scrollear dentro de el, usamos inner frame como el objeto 
     right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
-
 
 # ------ CODIGO PARA CREAR LA VENTANA PRINCIPAL/MAIN LOOP -----------------
 
