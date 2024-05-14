@@ -54,20 +54,19 @@ def open_file():
 def clear():
     # Buscamos si el objeto existe para borrar todo
     try:
-        inner_frame
+        fig_canvas1
     except NameError:
         print("error")
     else:
         fig_canvas1.get_tk_widget().destroy()
-        inner_frame.destroy()
-        scrollbar_x.destroy()
-        scrollbar_y.destroy()
-        # toolbar.destroy()
-        right_frame.destroy()
 
 # Funcion para actualizar las scroll bars
 def scroll_function(*args):
     right_frame.configure(scrollregion=right_frame.bbox("all"))
+    
+def updateScrollRegion():
+	right_frame.update_idletasks()
+	right_frame.config(scrollregion=inner_frame.bbox())
 
 # ------ FUNCIONES PARA LOS WIDGETS ------------------------------------------------
 
@@ -148,22 +147,31 @@ def graph_reasons():        # Funcion para graficar las razones principales en u
     # Colocamos la toolbar en el grid
     # toolbar.grid(row=3, column=0, columnspan=4)
 
-# --- FUNCIONES PARA GRAFICAR ANALISIS NLP Y SKU
+# --- FUNCIONES PARA GRAFICAR ANALISIS NLP Y SKU ----------------------------------------------
+
+# def createScrollableContainer():
+# 	right_frame.config(xscrollcommand=HorizontalScrollBar.set,yscrollcommand=VerticalScrollBar.set, highlightthickness=0)
+# 	HorizontalScrollBar.config(orient=tk.HORIZONTAL, command=inner_frame.xview)
+# 	VerticalScrollBar.config(orient=tk.VERTICAL, command=inner_frame.yview)
+
+# 	HorizontalScrollBar.pack(fill=tk.X, side=tk.BOTTOM, expand=tk.FALSE)
+# 	VerticalScrollBar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
+#     right_frame.grid(row=0, column=1, padx=10, pady=10)
+# 	right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
 
 # Funcion para crear el marco derecho
-def makeCanvas():
-    global right_frame
-    frame = Frame(root, height=winHeight-50, width=winWidth-560)
-    frame.grid(row=0, column=1)
-    # Canvas para la columna derecha
-    right_frame = tk.Canvas(frame, height=winHeight-50, width=winWidth-562, bg='white')
-    right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
-    # right_frame.grid(row=0, column=1, padx=10, pady=10)
-
+# def makeCanvas():
+#     global right_frame
+#     # Canvas para la columna derecha
+#     right_frame = tk.Canvas(root, height=winHeight-50, width=winWidth-562, bg='white')
+#     # right_frame.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+#     right_frame.grid(row=0, column=1, padx=10, pady=10)     
+    
 # Funcion para crear graficas NLP y SKU
+
 def graph_nlp():
 
-    makeCanvas()
+    # makeCanvas()
 
     global inner_frame
     global scrollbar_x
@@ -175,8 +183,8 @@ def graph_nlp():
     num_clusters = int(num_clusters_btn.get())
 
     # Marco interior para contener los marcos vacíos
-    inner_frame = tk.Frame(right_frame, bg='white', padx=5, pady=5)
-    right_frame.create_window((0, 0), window=inner_frame, anchor="nw")
+    # inner_frame = tk.Frame(right_frame, bg='white', padx=5, pady=5)
+    # right_frame.create_window((0, 0), window=inner_frame, anchor="nw")
 
     # Realizamos el numero de analisis NLP para el numero de razones (si es posible)
     for i in range(num_reasons):
@@ -247,17 +255,17 @@ def graph_nlp():
                 axes.text(v+max(values)/5, k, f'{data2[2][k]}%', ha='center', va='center', weight=200)
             except KeyError:
                 break
-
+    updateScrollRegion()
     # Creamos las scrollbars y las configuramos
-    scrollbar_y = ttk.Scrollbar(root, orient="vertical", command=right_frame.yview)
-    scrollbar_y.grid(row=0, column=2, sticky='NS')
+    # scrollbar_y = ttk.Scrollbar(root, orient="vertical", command=right_frame.yview)
+    # scrollbar_y.grid(row=0, column=2, sticky='NS')
 
-    scrollbar_x = ttk.Scrollbar(root, orient="horizontal", command=right_frame.xview)
-    scrollbar_x.grid(row=1, column=1, columnspan=2, sticky='WE')
+    # scrollbar_x = ttk.Scrollbar(root, orient="horizontal", command=right_frame.xview)
+    # scrollbar_x.grid(row=1, column=1, columnspan=2, sticky='WE')
 
-    right_frame.configure(yscrollcommand=scrollbar_y.set)
-    right_frame.configure(xscrollcommand=scrollbar_x.set)
-    right_frame.bind("<Configure>", scroll_function)
+    # right_frame.configure(yscrollcommand=scrollbar_y.set)
+    # right_frame.configure(xscrollcommand=scrollbar_x.set)
+    # right_frame.bind("<Configure>", scroll_function)
 
     b3['state'] = 'normal'
 
@@ -267,7 +275,10 @@ def graph_nlp():
 def create_widgets():
 
     global left_frame           # Marco izquierdo
-    # global right_frame          # Marco derecho (canvas)
+    global right_frame          # Marco derecho (canvas)
+    global HorizontalScrollBar
+    global VerticalScrollBar
+    global inner_frame
 
     # Marco izquierdo
     left_frame = tk.Frame(root, bg="lightblue", highlightbackground='#646464', highlightthickness=2)
@@ -342,6 +353,26 @@ def create_widgets():
         entry = tk.Spinbox(
             entry_column, from_=3, to=6, textvariable=num_var[i])
         entry.pack()
+        
+        
+    right_frame = tk.Canvas(root, height=winHeight-50, width=winWidth-562, bg='white')    
+    inner_frame = tk.Frame(right_frame)
+    HorizontalScrollBar = tk.Scrollbar(root)
+    VerticalScrollBar = tk.Scrollbar(root)
+    
+    right_frame.config(xscrollcommand=HorizontalScrollBar.set,yscrollcommand=VerticalScrollBar.set, highlightthickness=0)
+    HorizontalScrollBar.config(orient=tk.HORIZONTAL, command=right_frame.xview)
+    VerticalScrollBar.config(orient=tk.VERTICAL, command=right_frame.yview)
+    
+    # HorizontalScrollBar.pack(fill=tk.X, side=tk.BOTTOM, expand=tk.FALSE)
+    # VerticalScrollBar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
+    
+    VerticalScrollBar.grid(row=0, column=2, sticky='NS')
+    HorizontalScrollBar.grid(row=1, column=1, columnspan=2, sticky='WE')
+    
+    right_frame.grid(row=0, column=1, padx=10, pady=10)
+    right_frame.create_window(0, 0, window=inner_frame, anchor=tk.NW)
+
 
 # ------ CODIGO PARA CREAR LA VENTANA PRINCIPAL/MAIN LOOP -----------------
 
