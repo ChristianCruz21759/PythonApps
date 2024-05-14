@@ -1,39 +1,43 @@
 import tkinter as tk
-from tkinter import ttk
-
-colors = ["red", "blue", "green", "orange", "yellow", "red"]
-
-def scroll_function(*args):
-    canvas.configure(scrollregion=canvas.bbox("all"), width=200, height=200)
 
 root = tk.Tk()
-root.geometry("400x300")
 
-# Crear un contenedor de frames
-canvas = tk.Canvas(root, bg="lightgrey")
-canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=10, pady=10)
+# Tkinter widgets needed for scrolling.  The only native scrollable container that Tkinter provides is a canvas.
+# A Frame is needed inside the Canvas so that widgets can be added to the Frame and the Canvas makes it scrollable.
+cTableContainer = tk.Canvas(root)
+fTable = tk.Frame(cTableContainer)
+sbHorizontalScrollBar = tk.Scrollbar(root)
+sbVerticalScrollBar = tk.Scrollbar(root)
 
-canvas2 = tk.Canvas(root, bg="lightblue")
-canvas2.pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)
+# Updates the scrollable region of the Canvas to encompass all the widgets in the Frame
+def updateScrollRegion():
+	cTableContainer.update_idletasks()
+	cTableContainer.config(scrollregion=fTable.bbox())
 
-scrollbar = ttk.Scrollbar(root, orient="vertical", command=canvas.yview)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+# Sets up the Canvas, Frame, and scrollbars for scrolling
+def createScrollableContainer():
+	cTableContainer.config(xscrollcommand=sbHorizontalScrollBar.set,yscrollcommand=sbVerticalScrollBar.set, highlightthickness=0)
+	sbHorizontalScrollBar.config(orient=tk.HORIZONTAL, command=cTableContainer.xview)
+	sbVerticalScrollBar.config(orient=tk.VERTICAL, command=cTableContainer.yview)
 
-canvas.configure(yscrollcommand=scrollbar.set)
-canvas.bind("<Configure>", scroll_function)
+	sbHorizontalScrollBar.pack(fill=tk.X, side=tk.BOTTOM, expand=tk.FALSE)
+	sbVerticalScrollBar.pack(fill=tk.Y, side=tk.RIGHT, expand=tk.FALSE)
+	cTableContainer.pack(fill=tk.BOTH, side=tk.LEFT, expand=tk.TRUE)
+	cTableContainer.create_window(0, 0, window=fTable, anchor=tk.NW)
 
-# Crear el frame principal dentro del canvas
-frame = tk.Frame(canvas, bg="pink")
-canvas.create_window((0, 0), window=frame, anchor="nw")
+# Adds labels diagonally across the screen to demonstrate the scrollbar adapting to the increasing size
+i=0
+def addNewLabel():
+	global i
+	tk.Label(fTable, text="Hello World").grid(row=i, column=i)
+	i+=1
 
-num_frames = 6
+	# Update the scroll region after new widgets are added
+	updateScrollRegion()
 
-for i in range(num_frames):
+	root.after(1000, addNewLabel)
 
-    # Crear tres frames internos dentro del frame principal
-    inner_frames = tk.Frame(frame, bg=colors[i], width=200, height=200)
+createScrollableContainer()
+addNewLabel()
 
-    # Colocar los frames internos dentro del frame principal
-    inner_frames.grid(row=i, column=0, padx=10, pady=10)
-    
 root.mainloop()
