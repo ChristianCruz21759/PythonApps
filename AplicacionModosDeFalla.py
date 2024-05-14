@@ -1,21 +1,19 @@
 # Analisis Modos de Falla para sistema ATLAS
 # Desarrollado por: Christian Cruz
-# Fecha: 26/4/2024
+# Fecha: 14/5/2024
 
-# Definicion de librerias a utilizar
-
-# Cosas por arreglar
+# --------- TO DO LIST ---------
 # max df and min df check value error
-# download stop words once
 # delete console from appearing --noconsole on creating app
 # add loaded file alert
 
-# Botones
+# IMPORTANDO LIBRERIAS
 
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+import nltk
 import nlp_functions
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -179,7 +177,7 @@ def graph_nlp():
     for i in range(num_reasons):
 
         data, keywords = nlp_functions.getData_topics(
-            new_df, num_reasons, i+1, num_clusters, num_keywords)
+            new_df, num_reasons, i+1, num_clusters, num_keywords, stopwords_es)
 
         values = [float(x) for x in data[1]]
         percentages = [float(x) for x in data[2]]
@@ -385,6 +383,15 @@ root.resizable(0, 0)
 pic = PhotoImage(file="apex logo.png")
 root.iconphoto(False, pic)
 
+nltk.download('punkt')
+nltk.download('stopwords')
+
+stopwords_es = nltk.corpus.stopwords.words('spanish')
+# Descargar los recursos necesarios de NLTK
+
+my_stopwords = ['dee', 'agr', 'een', 'nan', 'iw', '']
+stopwords_es.extend(my_stopwords)
+    
 # Llamar a la función para crear widgets
 create_widgets()
 

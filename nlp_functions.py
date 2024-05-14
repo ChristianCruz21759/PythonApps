@@ -68,11 +68,11 @@ def getData_top4(df, num_reasons, num_top):
     return data
 
 #Funcion que retorna los datos para graficar los topics de cada razon
-def getData_topics(df, num_reasons, reason, num_clusters, num_keywords):
+def getData_topics(df, num_reasons, reason, num_clusters, num_keywords, stopwords):
 
     # Descargar los recursos necesarios de NLTK
-    nltk.download('punkt')
-    nltk.download('stopwords')
+    # nltk.download('punkt')
+    # nltk.download('stopwords')
 
     top4 = df.groupby('Reason')['Hours'].sum()
     top4 = top4.sort_values(ascending = False)
@@ -80,13 +80,13 @@ def getData_topics(df, num_reasons, reason, num_clusters, num_keywords):
 
     df_reason = df[df['Reason'] == top4.index[reason-1]]
 
-    stopword_es = nltk.corpus.stopwords.words('spanish')
-    my_stopwords = ['dee', 'agr', 'een', 'nan', 'iw', '']
-    stopword_es.extend(my_stopwords)
+
+    # my_stopwords = ['dee', 'agr', 'een', 'nan', 'iw', '']
+    # stopwords_es.extend(my_stopwords)
 
     # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, preprocessor=lambda x: re.sub(r'\d+', '', x))
     # count_vect = CountVectorizer(max_df=0.8, min_df=5, stop_words= stopwords.words('spanish'),lowercase= True, token_pattern="[^\W\d_]+")
-    count_vect = TfidfVectorizer(max_df=0.8, min_df=5, stop_words= stopword_es, lowercase= True, token_pattern="[^\W\d_]+")
+    count_vect = TfidfVectorizer(max_df=0.8, min_df=5, stop_words= stopwords, lowercase= True, token_pattern="[^\W\d_]+")
     doc_term_matrix = count_vect.fit_transform(df_reason['Notes'].values.astype('U'))
 
     LDA = LatentDirichletAllocation(n_components=num_clusters, random_state=42)
